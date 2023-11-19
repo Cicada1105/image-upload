@@ -1,7 +1,7 @@
 const fs = require( 'fs' );
 const http = require('http');
 
-const { handleCORS, retrieveBodyData, convertToImage } = require('./utils');
+const { handleCORS, retrieveBodyData, convertToImage, removeImage } = require('./utils');
 
 const PORT = process.env.PORT || 2020;
 const HOST = 'localhost';
@@ -49,7 +49,10 @@ const server = http.createServer((req,res) => {
 			}
 			else if ( req.method === 'DELETE' ) {
 				retrieveBodyData(req).then( data => {
-					res.end(JSON.stringify({ msg: "received" }));
+					if ( removeImage( data['imageName'] ) )
+						res.end(JSON.stringify({ msg: "received" }));
+					else
+						res.end(JSON.stringify({ msg: 'Error removing image' }));
 				})
 			}
 		break;

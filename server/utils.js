@@ -37,5 +37,25 @@ function convertToImage({ fileType, fileData }) {
 
 	return newFileName;
 }
+function removeImage(imgFileName) {
+	let serverImagePath = `${process.cwd()}/images/${imgFileName}`;
 
-module.exports = { handleCORS, retrieveBodyData, convertToImage }
+	let fileStats = fs.statSync( serverImagePath , { throwIfNoEntry: false });
+	if ( fileStats ) {
+		if ( fileStats.isFile() ) {
+			fs.unlinkSync( serverImagePath );
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+module.exports = { 
+	handleCORS, retrieveBodyData, 
+	convertToImage, removeImage
+}

@@ -24,8 +24,9 @@ function init() {
 			}
 			makeRequest( `/images/${imageName}`, options ).then( response => {
 				let { data, status } = response;
-				console.log(data);
-				console.log(status);
+				imageEl.setAttribute( 'src', null );
+			}).catch( err => {
+				console.log( err );
 			})
 		}
 		else {
