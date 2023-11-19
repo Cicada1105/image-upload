@@ -1,3 +1,4 @@
+const fs = require( 'fs' );
 const http = require('http');
 
 const { handleCORS, retrieveBodyData, convertToImage } = require('./utils');
@@ -29,10 +30,22 @@ const server = http.createServer((req,res) => {
 					res.end( JSON.stringify({ msg: err }) );
 				})
 			}
-			else if ( req.method === 'GET' ) {
-				let expectedImagePth = urlPaths.splice(0,1).join('');
+		break;
+		case 'images':
+			if ( req.method === "GET" ) {
+				let expectedImageFile = urlPaths.splice(0,1).join('');
 
-				res.end(JSON.stringify({ msg: 'Retrieve image'} ))
+				// Check if image exists
+				let serverImagePath = `./images/${expectedImageFile}`;
+				let fileStats = fs.statSync( serverImagePath ,{ throwIfNoEntry: false });
+				if( fileStats ) {
+					if ( fileStats.isFile() ) {
+						res.end(fs.readFileSync( serverImagePath ));
+					}
+				}
+				else {
+					res.end(JSON.stringify({ msg: `Unable to find server image path for: ${ expectedImageFile }`}))
+				}
 			}
 		break;
 	}
