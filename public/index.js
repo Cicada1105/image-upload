@@ -1,7 +1,8 @@
 const SERVER_URL = "http://localhost:2020";
 
 function init() {
-	let form = document.forms['image-upload-form'];
+	const form = document.forms['image-upload-form'];
+	const imageEl = document.getElementsByTagName('img')[0];
 	form.addEventListener('submit',uploadImage);
 
 	function uploadImage(e) {
@@ -20,8 +21,9 @@ function init() {
 				fileData: btoa(myReader.result)
 			}
 
-			makeRequest( '/upload-image', 'POST', imageUpload ).then( data => {
-				console.log(data);
+			makeRequest( '/upload-image', 'POST', imageUpload ).then( response => {
+				let { data, status } = response;
+				imageEl.setAttribute('src', data['image']);
 			}).catch( data => {
 				console.log(data);
 			});;
