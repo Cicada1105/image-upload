@@ -1,3 +1,5 @@
+const fs = require('fs');
+const { v4: uuid } = require('uuid');
 
 function handleCORS(req,res) {
 	const allowedMethods = [ 'GET', 'POST' ];
@@ -14,7 +16,26 @@ function handleCORS(req,res) {
 		res.end(JSON.stringify({ msg: 'CORS preflight handled' }));
 	}
 }
-
-module.exports = {
-	handleCORS
+function retrieveBodyData(req) {
+	return new Promise(( resolve, reject ) => {
+		let data = "";
+		req.on( 'data', d => data += d );
+		req.on( 'end', () => {
+			let dataStr = data.toString();
+			let parsedData = JSON.parse( dataStr );
+			resolve( parsedData );
+		});
+		req.on( 'error', (e) => reject( e ) );
+	});
 }
+function convertToImage({ fileType, fileData }) {
+	let imgSouceAsBuffer = Buffer.from(fileData, 'base64');
+	let newFileName = `${uuid()}.${fileType}`;
+	let fileNamePath = `${process.cwd()}/images`;
+
+	fs.writeFileSync( `${fileNamePath}/${newFileName}`, imgSouceAsBuffer );
+
+	return newFileName;
+}
+
+module.exports = { handleCORS, retrieveBodyData, convertToImage }

@@ -1,6 +1,6 @@
 const http = require('http');
 
-const { handleCORS } = require('./utils');
+const { handleCORS, retrieveBodyData, convertToImage } = require('./utils');
 
 const PORT = process.env.PORT || 2020;
 const HOST = 'localhost';
@@ -18,13 +18,20 @@ const server = http.createServer((req,res) => {
 	}
 	switch( urlPaths.splice(0,2).join('') ) {
 		case 'upload-image' :
-			if ( req.method === "POST" ) {
-				console.log(urlPaths);
-				res.end(JSON.stringify({ msg: 'Posting' }));
+			// Ensure request is a post request and nothing else exists in the URL
+			if ( (req.method === "POST") && (urlPaths.length === 0) ) {
+				retrieveBodyData(req).then( data => {
+					let { fileName, fileType, fileData } = data;
+
+					let imageSrc = convertToImage({ fileType, fileData });
+					res.end( JSON.stringify({ msg: 'Success', image: `http://${HOST}:${PORT}/images/${imageSrc}` }) );
+				}).catch( err => {
+					res.end( JSON.stringify({ msg: err }) );
+				})
 			}
 			else if ( req.method === 'GET' ) {
 				let expectedImagePth = urlPaths.splice(0,1).join('');
-				
+
 				res.end(JSON.stringify({ msg: 'Retrieve image'} ))
 			}
 		break;

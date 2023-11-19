@@ -17,7 +17,7 @@ function init() {
 			let imageUpload = {
 				fileName,
 				fileType: file.type.split("/")[1],
-				data: btoa(myReader.result)
+				fileData: btoa(myReader.result)
 			}
 
 			makeRequest( '/upload-image', 'POST', imageUpload ).then( data => {
@@ -51,7 +51,7 @@ function makeRequest(path, method, body) {
 		}).then(response => {
 			response.json().then(data => 
 				resolve({
-					msg: data.msg,
+					data,
 					status: response.status
 				})
 			)
