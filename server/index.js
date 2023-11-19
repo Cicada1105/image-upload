@@ -47,6 +47,11 @@ const server = http.createServer((req,res) => {
 					res.end(JSON.stringify({ msg: `Unable to find server image path for: ${ expectedImageFile }`}))
 				}
 			}
+			else if ( req.method === 'DELETE' ) {
+				retrieveBodyData(req).then( data => {
+					res.end(JSON.stringify({ msg: "received" }));
+				})
+			}
 		break;
 	}
 });
