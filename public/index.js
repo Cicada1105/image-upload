@@ -20,8 +20,14 @@ function init() {
 				fileType: file.type.split("/")[1],
 				fileData: btoa(myReader.result)
 			}
-
-			makeRequest( '/upload-image', 'POST', imageUpload ).then( response => {
+			let options = {
+				method: 'POST',
+				body: imageUpload,
+				headers: {
+					'Content-Type' : 'application/json'
+				}
+			}
+			makeRequest( '/upload-image', options ).then( response => {
 				let { data, status } = response;
 				imageEl.setAttribute('src', data['image']);
 			}).catch( data => {
@@ -42,15 +48,14 @@ function removeFileExtension( file ) {
 	return fileName;
 }
 
-function makeRequest(path, method, body) {
+function makeRequest(path, options) {
 	return new Promise((resolve,reject) => {
-		fetch(`${SERVER_URL}${path}`,{
-			method: method,
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(body)
-		}).then(response => {
+		let { method, headers, body } = options;
+		options['method'] = method || 'GET';
+		options['headers'] = headers || null;
+		options['body'] = body ? JSON.stringify(body) : null;
+
+		fetch(`${SERVER_URL}${path}`,options).then(response => {
 			response.json().then(data => 
 				resolve({
 					data,
