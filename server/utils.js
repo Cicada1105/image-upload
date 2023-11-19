@@ -2,7 +2,7 @@ const fs = require('fs');
 const { v4: uuid } = require('uuid');
 
 function handleCORS(req,res) {
-	const allowedMethods = [ 'GET', 'POST' ];
+	const allowedMethods = [ 'GET', 'POST', 'DELETE' ];
 	const allowedHeaders = [ 'origin', 'content-type', 'accept' ];
 
 	let reqHeaders = req.headers;

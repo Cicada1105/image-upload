@@ -8,31 +8,53 @@ function init() {
 	function uploadImage(e) {
 		e.preventDefault();
 
-		let formEls = form.elements;
-		let file = formEls["imageFile"].files[0];
-		let fileName = removeFileExtension(file.name);
-		// Convert file to array buffer to be sent and stored in request
-		let myReader = new FileReader();
-		myReader.readAsBinaryString(file);
-		myReader.onloadend = function() {
-			let imageUpload = {
-				fileName,
-				fileType: file.type.split("/")[1],
-				fileData: btoa(myReader.result)
-			}
+		let submitter = e.submitter;
+
+		if ( submitter.getAttribute( 'formmethod' ) === 'DELETE' ) {
+			let imageSrc = imageEl.getAttribute( 'src' );
+			let imageName = imageSrc.split('/').slice(-1)[0];
 			let options = {
-				method: 'POST',
-				body: imageUpload,
+				method: 'DELETE',
 				headers: {
 					'Content-Type' : 'application/json'
+				},
+				body: {
+					imageName
 				}
 			}
-			makeRequest( '/upload-image', options ).then( response => {
+			makeRequest( `/images/${imageName}`, options ).then( response => {
 				let { data, status } = response;
-				imageEl.setAttribute('src', data['image']);
-			}).catch( data => {
 				console.log(data);
-			});;
+				console.log(status);
+			})
+		}
+		else {
+			let formEls = form.elements;
+			let file = formEls["imageFile"].files[0];
+			let fileName = removeFileExtension(file.name);
+			// Convert file to array buffer to be sent and stored in request
+			let myReader = new FileReader();
+			myReader.readAsBinaryString(file);
+			myReader.onloadend = function() {
+				let imageUpload = {
+					fileName,
+					fileType: file.type.split("/")[1],
+					fileData: btoa(myReader.result)
+				}
+				let options = {
+					method: 'POST',
+					body: imageUpload,
+					headers: {
+						'Content-Type' : 'application/json'
+					}
+				}
+				makeRequest( '/upload-image', options ).then( response => {
+					let { data, status } = response;
+					imageEl.setAttribute('src', data['image']);
+				}).catch( data => {
+					console.log(data);
+				});;
+			}	
 		}
 	}
 }
